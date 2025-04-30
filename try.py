@@ -112,7 +112,7 @@ def make_reservation(session, reservations, resource_id):
         }
         
         start_time = datetime.datetime.now()
-        max_wait_time = 30
+        max_wait_time = 120
         attempt_count = 0
         
         while True:
