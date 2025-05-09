@@ -85,4 +85,4 @@ python try.py --time "2025-05-20 13:14:00"
 - `--period2`: 第二个时间段ID（当slots=2时使用）
 - `--sub_resource_id2`: 第二个台号ID（当slots=2时使用）
 
-# 提醒：场号可能改变，自行检查网络更新场号，period、sub_resource_id在launch请求显示
+# 提醒：场号可能改变，自行检查网络更新场号，即打开检查，选择网络，选场预约即产生launch请求，period、sub_resource_id在launch请求显示
