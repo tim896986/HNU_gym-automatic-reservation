@@ -79,11 +79,10 @@ python try.py --time "2025-05-20 13:14:00"
 - `--password`: 密码
 - `--resource_id`: 场馆资源ID
 - `--slots`: 预约时段数（1或2）
-
-###
-场号可能改变，自行检查网络更新场号
 - `--date`: 预约日期（格式：YYYY-MM-DD）
 - `--period1`: 第一个时间段ID
 - `--sub_resource_id1`: 第一个台号ID
 - `--period2`: 第二个时间段ID（当slots=2时使用）
 - `--sub_resource_id2`: 第二个台号ID（当slots=2时使用）
+
+### 场号可能改变，自行检查网络更新场号
