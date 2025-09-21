@@ -1,53 +1,73 @@
-# HNU_gym-automatic-reservation
-
 # HNU体育馆自动预约系统
 
 这是一个用于湖南大学体育馆自动预约的Python脚本。该脚本可以自动在指定时间进行体育馆场地预约，支持同时预约多个时段。
 
 ## 功能特点
 
-- 自动登录湖南大学统一认证系统
-- 支持预约1-2个时段
-- 自动等待到预约时间点
-- 预约失败自动重试
-- 支持配置文件方式运行
-- 支持命令行参数方式运行
+- 🔐 基于Cookie的自动登录（无需用户名密码）
+- ⏰ 支持预约1-2个时段
+- 🎯 自动等待到预约时间点
+- 🔄 预约失败自动重试机制
+- 📝 详细的日志记录
+- ⚙️ 支持配置文件方式运行
+- 🖥️ 支持命令行参数方式运行
+- 🌐 网络连接检测
+- 🛡️ 完善的错误处理
 
 ## 准备工作
+
 ### 1. Python环境要求
 
 - Python 3.6或更高版本
 
-- 可以通过以下命令检查Python版本：
-
+可以通过以下命令检查Python版本：
 ```bash
-python  --version
+python --version
 ```
+
 ### 2. 安装依赖
 
 ```bash
-pip install requests
+pip install -r requirements.txt
 ```
 
-### 3. 配置文件设置
+或者手动安装：
+```bash
+pip install requests urllib3
+```
+
+### 3. 获取Cookie
+
+1. 打开浏览器，访问 [湖南大学统一认证系统](http://cas.hnu.edu.cn/)
+2. 使用学号和密码登录
+3. 登录成功后，按F12打开开发者工具
+4. 在Network标签页中找到任意请求，复制Cookie值
+5. 将Cookie保存到项目根目录的 `cookie.txt` 文件中
+
+### 4. 配置文件设置
 
 在项目根目录创建 `config.json` 文件，内容如下：
 
 ```json
 {
-    "username": "你的学号",
-    "password": "你的密码",
-    "resource_id": "场馆资源ID",
-    "slots": 1,
-    "date": "2025-05-05",
-    "period1": "时间段1ID",
-    "sub_resource_id1": "台号1ID",
-    "period2": "时间段2ID",
-    "sub_resource_id2": "台号2ID"
+    "username": "",
+    "password": "",
+    "resource_id": "57",
+    "date": "2025-09-12",
+    "slots": 2,
+    "period1": "4233",
+    "sub_resource_id1": "21080",
+    "period2": "4234",
+    "sub_resource_id2": "21079",
+    "max_retries": 10000,
+    "retry_interval": 1,
+    "max_attempts": 1000,
+    "retry_delay": 0.2,
+    "request_timeout": 1
 }
 ```
 
-### 4. 场馆信息
+### 5. 场馆信息
 
 在 `场馆resource_id，period,sub_resource_id.xlsx` 文件中可以找到：
 - 各场馆的resource_id
@@ -56,31 +76,113 @@ pip install requests
 
 ## 使用方法
 
-### 方式一：使用配置文件（推荐）
+### 方式一：交互式预约（推荐）
 
-1. 编辑 `config.json` 文件，填入必要信息
+1. 确保 `cookie.txt` 和 `config.json` 文件已正确配置
 2. 运行脚本：
 ```bash
 python try.py
 ```
+3. 程序会显示可选的时间段和台号，按提示选择即可
 
 ### 方式二：命令行参数
 
 ```bash
-python try.py --username "学号" --password "密码" --resource_id "资源id" --period1 "时间段1" --sub_resource_id1 "台号1" --slots 1 --date "2024-05-20"
-```
-可设置程序启动时间：
-```bash
-python try.py --time "2025-05-20 13:14:00"
+python try.py --time "2025-01-15 08:00:00" --date "2025-01-15"
 ```
 
 参数说明：
-- `--username`: 学号
-- `--password`: 密码
+- `--time`: 预约开始时间（格式：YYYY-MM-DD HH:MM:SS）
+- `--date`: 预约日期（格式：YYYY-MM-DD）
 - `--resource_id`: 场馆资源ID
 - `--slots`: 预约时段数（1或2）
-- `--date`: 预约日期（格式：YYYY-MM-DD）
 - `--period1`: 第一个时间段ID
 - `--sub_resource_id1`: 第一个台号ID
 - `--period2`: 第二个时间段ID（当slots=2时使用）
 - `--sub_resource_id2`: 第二个台号ID（当slots=2时使用）
+
+## 配置说明
+
+### config.json 配置项
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `username` | 用户名（已废弃，使用Cookie登录） | "" |
+| `password` | 密码（已废弃，使用Cookie登录） | "" |
+| `resource_id` | 场馆资源ID | "57" |
+| `date` | 预约日期 | "2025-09-12" |
+| `slots` | 预约时段数 | 2 |
+| `period1` | 第一个时间段ID | "4233" |
+| `sub_resource_id1` | 第一个台号ID | "21080" |
+| `period2` | 第二个时间段ID | "4234" |
+| `sub_resource_id2` | 第二个台号ID | "21079" |
+| `max_retries` | 外层重试次数 | 10000 |
+| `retry_interval` | 外层重试间隔（秒） | 1 |
+| `max_attempts` | 内层重试次数 | 1000 |
+| `retry_delay` | 内层重试间隔（秒） | 0.2 |
+| `request_timeout` | 请求超时时间（秒） | 1 |
+
+### 重试机制说明
+
+- **外层重试**：整个预约流程失败后重新开始的次数
+- **内层重试**：单次预约流程中的最大尝试次数
+- **重试间隔**：每次重试之间的等待时间
+- **请求超时**：单次HTTP请求的超时时间
+
+## 程序行为
+
+1. **启动**: 程序启动后会显示配置参数
+2. **网络检查**: 检查网络连接是否正常
+3. **Cookie验证**: 验证cookie是否有效
+4. **获取选项**: 拉取可预约的时间段和台号
+5. **用户选择**: 用户选择要预约的时间段和台号
+6. **预约尝试**: 开始预约，支持内层重试
+7. **失败重试**: 如果预约失败，等待指定时间后重新开始整个流程
+8. **成功结束**: 预约成功后程序结束
+9. **达到上限**: 达到最大重试次数后程序结束
+
+## 日志文件
+
+程序运行时会生成 `reservation.log` 文件，记录详细的运行日志，包括：
+- 程序启动和配置信息
+- 每次重试的详细信息
+- 错误信息和异常情况
+- 预约成功或失败的结果
+
+## 注意事项
+
+1. 确保 `cookie.txt` 文件存在且包含有效的cookie
+2. 确保 `config.json` 配置文件格式正确
+3. 程序支持 Ctrl+C 中断
+4. 建议根据网络情况调整重试参数
+5. 预约失败时会自动重试，无需手动重启程序
+6. Cookie可能会过期，需要定期更新
+
+## 故障排除
+
+### 常见问题
+
+1. **Cookie失效**
+   - 重新登录获取新的Cookie
+   - 更新 `cookie.txt` 文件
+
+2. **网络连接失败**
+   - 检查网络连接
+   - 尝试更换网络环境
+
+3. **预约失败**
+   - 检查时间段和台号是否正确
+   - 确认预约时间是否已到
+   - 调整重试参数
+
+4. **程序崩溃**
+   - 查看 `reservation.log` 日志文件
+   - 检查配置文件格式是否正确
+
+## 免责声明
+
+本程序仅供学习和研究使用，请遵守学校相关规定，合理使用预约系统。使用本程序产生的任何后果由使用者自行承担。
+
+## 许可证
+
+本项目采用MIT许可证，详见LICENSE文件。

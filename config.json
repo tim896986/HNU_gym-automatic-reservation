@@ -1,11 +1,16 @@
 {
-    "username": "111",
-    "password": "111",
+    "username": "",
+    "password": "",
     "resource_id": "57",
-    "date": "2025-04-29",
+    "date": "2025-09-12",
     "slots": 2,
-    "period1": "3897",
-    "sub_resource_id1": "16411",
-    "period2": "3898",
-    "sub_resource_id2": "16410"
+    "period1": "4233",
+    "sub_resource_id1": "21080",
+    "period2": "4234",
+    "sub_resource_id2": "21079",
+    "max_retries": 10000,
+    "retry_interval": 1,
+    "max_attempts": 1000,
+    "retry_delay": 0.2,
+    "request_timeout": 1
 } 
