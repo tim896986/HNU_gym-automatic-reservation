@@ -114,10 +114,10 @@ python try.py --time "2025-01-15 08:00:00" --date "2025-01-15"
 | `resource_id` | 场馆资源ID | "57" |
 | `date` | 预约日期 | "2025-09-12" |
 | `slots` | 预约时段数 | 2 |
-| `period1` | 第一个时间段ID | "4233" |（已废弃）
-| `sub_resource_id1` | 第一个台号ID | "21080" |（已废弃）
-| `period2` | 第二个时间段ID | "4234" |（已废弃）
-| `sub_resource_id2` | 第二个台号ID | "21079" |（已废弃）
+| `period1` | 第一个时间段ID（已废弃） | "4233" |
+| `sub_resource_id1` | 第一个台号ID （已废弃）| "21080" |
+| `period2` | 第二个时间段ID （已废弃）| "4234" |
+| `sub_resource_id2` | 第二个台号ID（已废弃） | "21079" |
 | `max_retries` | 外层重试次数 | 10000 |
 | `retry_interval` | 外层重试间隔（秒） | 1 |
 | `max_attempts` | 内层重试次数 | 1000 |
